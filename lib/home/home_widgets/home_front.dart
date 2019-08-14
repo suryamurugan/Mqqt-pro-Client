@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:mqtt_client/mqtt_client.dart';
 //import 'package:mqtt_pro_client/pubsub/agenda_page.dart';
 import 'package:mqtt_pro_client/config/index.dart';
@@ -11,12 +12,12 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mqtt_pro_client/db_helper.dart';
 import 'package:mqtt_pro_client/models/brokerObj.dart';
-//import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeFront extends StatelessWidget {
  
 
-bool a = true;
+bool a = false;
   
 
   //List<BrokerObj> listbro = [BrokerObj("vfsv","vsfv","vsfvfs","vcsv")];
@@ -46,20 +47,95 @@ final dbHelper = DatabaseHelper.instance;
       builder: (BuildContext context, AsyncSnapshot<List<BrokerObj>> snapshot){
         if (snapshot.hasData) {
             return ListView.builder(
+              
               itemCount: snapshot.data.length,
               itemBuilder: (BuildContext context, int index) {
                 BrokerObj item = snapshot.data[index];
-                return ListTile(
-                  title: Text(item.hostname),
-                  leading: Text(item.id.toString()),
-                  trailing: Checkbox(
-                    onChanged: (bool value) {
-                      //DBProvider.db.blockClient(item);
-                      //setState(() {});
+                return Dismissible(
+                  
+                  key: UniqueKey(),
+                  background: Container(color: Colors.grey),
+                    onDismissed: (direction) {
+                        dbHelper.delete(item.id);
+                       // DBProvider.db.deleteClient(item.id);
                     },
-                    //value: item.blocked,
-                    value: true,
+                  child: Card(
+          elevation: 0.6,
+          child: ListTile(
+            onTap: () {
+              /*Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => SessionDetail(
+                    session: allSessions[i],
                   ),
+                ),
+              );*/
+            },
+            // dense: true,
+            isThreeLine: true,
+            trailing: RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                text: 'port\n',
+                style: Theme.of(context)
+                    .textTheme
+                    .title
+                    .copyWith(fontSize: 14, fontWeight: FontWeight.bold),
+                children: [
+                  TextSpan(
+                    text:item.portNo,
+                    style: Theme.of(context).textTheme.subtitle.copyWith(
+                          fontSize: 12,
+                        ),
+                  ),
+                ],
+              ),
+            ),
+            leading: Hero(
+              tag: item.id,
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: Colors.white,
+                child: Image.asset("server.png"),
+                //backgroundImage:
+                  //  ExactAssetImage("assets/server.png",scale: 100.0)
+              ),
+            ),
+            title: RichText(
+              text: TextSpan(
+                text:item.hostname+'\n',
+                style: Theme.of(context).textTheme.title.copyWith(fontSize: 18),
+                children: [
+                  TextSpan(
+                      text: item.clientId,
+                      style: Theme.of(context).textTheme.subtitle.copyWith(
+                            fontSize: 14,
+                            color: Tools.multiColors[Random().nextInt(4)],
+                          ),
+                      children: []),
+                ],
+              ),
+            ),
+            subtitle: Text(
+              item.username,
+              style: Theme.of(context).textTheme.caption.copyWith(
+                    fontSize: 10.0,
+                  ),
+            ),
+          ),
+        ),
+                  /*ListTile(
+                    
+                  
+                    contentPadding: EdgeInsets.all(10.0),
+                  
+                  title: Text(item.hostname),
+                  subtitle: Text(item.clientId),
+                  leading: Text(item.portNo.toString()),
+                  trailing: Text(item.portNo.toString())
+                ),*/
+
                 );
               },
             );

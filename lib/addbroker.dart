@@ -27,8 +27,11 @@ class AddBrokerPage extends StatefulWidget {
 class AddBrokerPageState extends State<AddBrokerPage>{
   final dbHelper = DatabaseHelper.instance;
 
+ final clientIdController = TextEditingController();
  final hostnameController = TextEditingController();
  final portNoController = TextEditingController();
+ final usernameController = TextEditingController();
+ final passwordController = TextEditingController();
 
 
 
@@ -39,19 +42,41 @@ class AddBrokerPageState extends State<AddBrokerPage>{
     //var state = _homeBloc.currentState as InHomeState;
    
     return DevScaffold(
-      body: Center (
+      body: new SingleChildScrollView(
+        child: 
+      Center (
       
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            
             Image.asset("newbroker.png"),
+             SizedBox(height: 10,),
+            Container(
+              padding: EdgeInsets.fromLTRB(30, 10, 30, 10),
+              child: TextField(
+              
+            decoration: InputDecoration(labelText: "Client ID",
+            suffixIcon: Icon(Icons.supervised_user_circle),
+            labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+            ),
+            //style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
+            //autofocus: true,
+            keyboardType: TextInputType.text,
+            controller: clientIdController,
+            ),
+            ),
             SizedBox(height: 10,),
             Container(
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
               child: TextField(
             decoration: InputDecoration(labelText: "Hostname/Server IP",
+            suffixIcon: Icon(Icons.computer),
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(32)))
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
             ),
             //style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
             //autofocus: true,
@@ -59,14 +84,16 @@ class AddBrokerPageState extends State<AddBrokerPage>{
             controller: hostnameController,
             ),
             ),
-            SizedBox(height: 10,),
+             SizedBox(height: 10,),
             Container(
-              padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+              padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
               child: TextField(
               
             decoration: InputDecoration(labelText: "Port",
+            suffixIcon: Icon(Icons.web_asset),
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(32)))
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
             ),
             //style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
             //autofocus: true,
@@ -75,6 +102,43 @@ class AddBrokerPageState extends State<AddBrokerPage>{
             ),
             ),
             SizedBox(height: 10,),
+            Container(
+              padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
+              child: TextField(
+              
+            decoration: InputDecoration(labelText: "username",
+            suffixIcon: Icon(Icons.account_circle),
+            labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+            ),
+            //style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
+            //autofocus: true,
+            keyboardType: TextInputType.text,
+            controller: usernameController,
+            ),
+            ),
+             SizedBox(height: 10,),
+            Container(
+              padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
+              child: TextField(
+              
+            decoration: InputDecoration(labelText: "Password",
+            suffixIcon: Icon(Icons.vpn_key),
+            
+            labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+            ),
+            //style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
+            //autofocus: true,
+            keyboardType: TextInputType.text,
+            controller: passwordController,
+            obscureText: true,
+            ),
+            ),
+            SizedBox(height: 10,),
+
             RaisedButton(
             child: Text("Done"),
             shape: StadiumBorder(),
@@ -84,17 +148,17 @@ class AddBrokerPageState extends State<AddBrokerPage>{
             onPressed: () {
               print("clicked");
               //_read();
-              _dbhinset(BrokerObj(clientId: "",
+              _dbhinset(BrokerObj(clientId: clientIdController.text,
                                   hostname:hostnameController.text,
                                   portNo: portNoController.text,
-                                  username: "",
-                                  password: "",
+                                  username: usernameController.text,
+                                  password: passwordController.text,
                                   ));
              // Navigator.pop(context,{});
               //_connect_to(context);
             },
           ),
-           RaisedButton(
+          /* RaisedButton(
             child: Text("save"),
             shape: StadiumBorder(),
             color: Colors.red,
@@ -107,14 +171,14 @@ class AddBrokerPageState extends State<AddBrokerPage>{
               //Navigator.pop(context,{});
               //_connect_to(context);
             },
-          ),
+          ),*/
             
             
 
 
           ],
         ),
-      ),
+      ),),
       title: "Add new broker",
     );
   }
@@ -125,6 +189,7 @@ class AddBrokerPageState extends State<AddBrokerPage>{
     var newbr = brokerObj;
     final id = dbHelper.insert(newbr);
     print("inserted bro $id");
+     Navigator.pop(context);
   }
 
   db_fetch() async{
