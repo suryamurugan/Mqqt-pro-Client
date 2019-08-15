@@ -5,6 +5,7 @@ import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_pro_client/config/index.dart';
 import 'package:mqtt_pro_client/models/brokerList.dart';
 import 'package:mqtt_pro_client/models/brokerObj.dart';
+import 'package:mqtt_pro_client/notmain.dart';
 import 'package:mqtt_pro_client/universal/image_card.dart';
 import 'package:mqtt_pro_client/utils/devfest.dart';
 import 'package:mqtt_pro_client/utils/tools.dart';
@@ -63,14 +64,16 @@ final dbHelper = DatabaseHelper.instance;
           elevation: 0.6,
           child: ListTile(
             onTap: () {
-              /*Navigator.push(
+
+              Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SessionDetail(
-                    session: allSessions[i],
+                 // builder: (context) => SessionDetail(
+                  //  session: allSessions[i],
+                  builder: (context)=>NotMain(brokerObj: item,),
                   ),
-                ),
-              );*/
+              
+              );
             },
             // dense: true,
             isThreeLine: true,
@@ -104,14 +107,17 @@ final dbHelper = DatabaseHelper.instance;
             ),
             title: RichText(
               text: TextSpan(
+                
                 text:item.hostname+'\n',
                 style: Theme.of(context).textTheme.title.copyWith(fontSize: 18),
                 children: [
                   TextSpan(
+                    
                       text: item.clientId,
                       style: Theme.of(context).textTheme.subtitle.copyWith(
                             fontSize: 14,
                             color: Tools.multiColors[Random().nextInt(4)],
+                            
                           ),
                       children: []),
                 ],

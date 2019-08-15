@@ -3,31 +3,53 @@ import 'dart:async';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:mqtt_client/mqtt_client.dart' as mqtt;
+import 'package:mqtt_pro_client/dev_scafold2.dart';
+import 'package:mqtt_pro_client/models/brokerObj.dart';
+import 'package:mqtt_pro_client/universal/dev_scaffold.dart';
 import 'models/message.dart';
 import 'dialogs/send_message.dart';
+import 'dart:math';
+import 'utils/tools.dart';
+class NotMain extends StatefulWidget {
+ 
+  
+final BrokerObj brokerObj;
+  NotMain({Key key, @required this.brokerObj}) : super(key: key);
 
-void main() => runApp(MyApp());
-
-class MyApp extends StatefulWidget {
+  
+  
+  static const String routeName = "/notmain";
   @override
-  _MyAppState createState() => _MyAppState();
+  _MyAppState createState() => _MyAppState(brokerObj:brokerObj);
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<NotMain> {
+  
+  
+  BrokerObj  brokerObj;
+
+  _MyAppState({this.brokerObj});
+
+  
+  
   PageController _pageController;
   int _page = 0;
 
   String broker = '165.22.209.7';
   mqtt.MqttClient client;
   mqtt.MqttConnectionState connectionState;
+  final topicController = TextEditingController();
+  final messageController = TextEditingController();
 
   StreamSubscription subscription;
 
-  TextEditingController topicController = TextEditingController();
   Set<String> topics = Set<String>();
 
+
+  
+  
+
   List<Message> messages = <Message>[];
-  ScrollController messageController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -51,65 +73,66 @@ class _MyAppState extends State<MyApp> {
       default:
         connectionStateIcon = Icons.cloud_off;
     }
-    void navigationTapped(int page) {
-      _pageController.animateToPage(page,
-          duration: const Duration(milliseconds: 300), curve: Curves.ease);
-    }
+  
 
-    void onPageChanged(int page) {
-      setState(() {
-        this._page = page;
-      });
-    }
-
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Text(broker),
-              SizedBox(
-                width: 8.0,
+    return DefaultTabController(
+      length: 2,
+      child: DevScaffold2(
+        title: brokerObj.hostname,
+          tabBar: TabBar(
+            
+            indicatorSize: TabBarIndicatorSize.label,
+            indicatorColor: Tools.multiColors[Random().nextInt(4)],
+            labelStyle: TextStyle(
+              fontSize: 12,
+            ),
+            isScrollable: false,
+          tabs: <Widget>[
+            Tab(
+              child: Text("Subscribe"),
+              icon: Icon(
+                //FontAwesomeIcons.cloudDownloadAlt,
+                Icons.ac_unit,
+                size: 12,
               ),
-              Icon(connectionStateIcon),
-            ],
-          ),
-        ),
-        floatingActionButton: _page == 2
-            ? Builder(builder: (BuildContext context) {
-                return FloatingActionButton(
-                  child: Icon(Icons.add),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute<String>(
-                          builder: (BuildContext context) =>
-                              SendMessageDialog(client: client),
-                          fullscreenDialog: true,
-                        ));
-                  },
-                );
-              })
-            : null,
-        bottomNavigationBar: BottomNavigationBar(
-          onTap: navigationTapped,
-          currentIndex: _page,
-          items: [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.cloud),
-              title: Text('Broker'),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.playlist_add),
-              title: Text('Subscriptions'),
+            Tab(
+              child: Text("Publish"),
+              icon: Icon(
+               //FontAwesomeIcons.planeDeparture,
+               Icons.access_alarm,
+                size: 12,
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.message),
-              title: Text('Messages'),
-            ),
+           /* Tab(
+              child: Text("Web & More"),
+              icon: Icon(
+                FontAwesomeIcons.chrome,
+                size: 12,
+              ),
+            )
+          */
           ],
         ),
+         body: TabBarView(
+          children: <Widget>[
+             _buildBrokerPage(connectionStateIcon),
+            _buildSubscriptionsPage(),
+          //  _buildMessagesPage(),
+           /* CloudScreen(
+              homeBloc: _homeBloc,
+            ),
+            MobileScreenPage(
+              homeBloc: _homeBloc,
+            ),
+            WebScreen(
+              homeBloc: _homeBloc,
+            ),
+            */
+          ],
+        ),
+       
+       /*
         body: PageView(
           controller: _pageController,
           onPageChanged: onPageChanged,
@@ -118,15 +141,64 @@ class _MyAppState extends State<MyApp> {
             _buildSubscriptionsPage(),
             _buildMessagesPage(),
           ],
-        ),
+        ),*/
       ),
     );
+    
   }
 
   Column _buildBrokerPage(IconData connectionStateIcon) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+   return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
+        Card(
+          elevation: 0,
+          
+          child:new Container(
+            padding: EdgeInsets.all(20),
+            
+            child: 
+              
+              Row(
+          
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            SizedBox(
+              width: 200.0,
+              child: TextField(
+                controller: topicController,
+                onSubmitted: (String topic) {
+                  _subscribeToTopic(topic);
+                },
+                decoration: InputDecoration(hintText: 'Please enter a topic'),
+              ),
+            ),
+            SizedBox(width: 8.0),
+            RaisedButton(
+              shape: StadiumBorder(),
+              color: Colors.red,
+              child: Text('add topic',style: TextStyle(color: Colors.white),),
+              onPressed: () {
+                _subscribeToTopic(topicController.value.text);
+              },
+            ),
+          ],
+        ) ,
+            
+          )
+        ),
+        
+        SizedBox(height: 16.0),
+        
+        Wrap(
+          spacing: 8.0,
+          runSpacing: 4.0,
+          alignment: WrapAlignment.start,
+          children: _buildTopicList(),
+        )
+   
+
+        /*
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
@@ -151,7 +223,7 @@ class _MyAppState extends State<MyApp> {
               _connect();
             }
           },
-        ),
+        ),*/
       ],
     );
   }
@@ -161,7 +233,7 @@ class _MyAppState extends State<MyApp> {
       children: <Widget>[
         Expanded(
           child: ListView(
-            controller: messageController,
+          
             children: _buildMessageList(),
           ),
         ),
@@ -180,6 +252,79 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
+Column _buildSubscriptionsPage() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+         
+          new Card(
+          
+          borderOnForeground: true,
+          elevation: 0.0,
+          child:new Padding(
+        padding: EdgeInsets.all(16.0),
+        child:new Column(
+            children: <Widget>[
+              SizedBox(
+              
+              child: TextField(
+                controller: topicController,
+                onSubmitted: (String topic) {
+                  _subscribeToTopic(topic);
+                },
+                decoration: InputDecoration(hintText: 'Topic'),
+              ),
+            ),
+            SizedBox(
+              
+              child: TextField(
+                controller: topicController,
+                onSubmitted: (String topic) {
+                  _subscribeToTopic(topic);
+                },
+                decoration: InputDecoration(hintText: 'Message'),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+             
+              RaisedButton(
+            child: Text("publish"),
+            shape: StadiumBorder(),
+            color: Colors.red,
+            colorBrightness: Brightness.dark,
+            //onPressed: () => Navigator.pushNamed(context, AgendaPage.routeName),
+            onPressed: () {
+              print("clicked");
+               // _connect_to(context);
+              //_connect_to(context);
+            },
+          ),
+          Container(
+            child: new Column(
+              children: <Widget>[
+                Text("Cdscs")
+
+              ],
+            ),
+
+          )
+            
+          
+          
+             
+            ],
+          ))
+        ),
+        
+            
+            
+      ],
+    );
+  }
+
+/*
   Column _buildSubscriptionsPage() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -215,7 +360,7 @@ class _MyAppState extends State<MyApp> {
         )
       ],
     );
-  }
+  }*/
 
   @override
   void dispose() {
@@ -227,6 +372,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     _pageController = PageController();
     super.initState();
+    _connect();
   }
 
   List<Widget> _buildMessageList() {
@@ -266,14 +412,30 @@ class _MyAppState extends State<MyApp> {
       ..sort((String a, String b) {
         return compareNatural(a, b);
       });
-    return sortedTopics
+    /*return sortedTopics
         .map((String topic) => Chip(
               label: Text(topic),
               onDeleted: () {
                 _unsubscribeFromTopic(topic);
               },
             ))
-        .toList();
+        .toList();*/
+        return sortedTopics.map((String topic)=>ListTile(
+          
+          title: Text("Message"),
+          leading: Text(topic,style: TextStyle(fontFamily: "GoogleSans",fontWeight: FontWeight.w600),),
+          trailing: IconButton(icon: Icon(Icons.delete_sweep,),
+                                onPressed: (){
+                                 // setState(() {
+                                    // /topics.remove(topic);
+                                    _unsubscribeFromTopic(topic);
+                                 // });
+                                  print(topics);
+                                  
+                                  
+                                },),
+        )
+      ).toList();
   }
 
   void _connect() async {
@@ -286,7 +448,7 @@ class _MyAppState extends State<MyApp> {
     /// The client identifier can be a maximum length of 23 characters. If a port is not specified the standard port
     /// of 1883 is used.
     /// If you want to use websockets rather than TCP see below.
-    client = mqtt.MqttClient(broker, '');
+    client = mqtt.MqttClient(brokerObj.hostname,brokerObj.portNo);
 
     /// A websocket URL must start with ws:// or wss:// or Dart will throw an exception, consult your websocket MQTT broker
     /// for details.
@@ -356,12 +518,16 @@ class _MyAppState extends State<MyApp> {
     _onDisconnected();
   }
 
+  void lo(){
+    
+  }
+
   void _onDisconnected() {
     setState(() {
       topics.clear();
       connectionState = client.connectionState;
       client = null;
-      subscription.cancel();
+      //subscription.cancel();
       subscription = null;
     });
     print('MQTT client disconnected');
@@ -382,18 +548,22 @@ class _MyAppState extends State<MyApp> {
     print('MQTT message: topic is <${event[0].topic}>, '
         'payload is <-- ${message} -->');
     print(client.connectionState);
+    print("THis message is from on MeSAAGE");
     setState(() {
+      
       messages.add(Message(
         topic: event[0].topic,
         message: message,
         qos: recMess.payload.header.qos,
       ));
       try {
+        /*
         messageController.animateTo(
           0.0,
           duration: Duration(milliseconds: 400),
           curve: Curves.easeOut,
         );
+        */
       } catch (_) {
         // ScrollController not attached to any scroll views.
       }
@@ -421,4 +591,6 @@ class _MyAppState extends State<MyApp> {
       });
     }
   }
+
+ 
 }

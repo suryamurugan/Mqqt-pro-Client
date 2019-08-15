@@ -4,6 +4,7 @@ import 'package:mqtt_pro_client/utils/devfest.dart';
 import 'index.dart';
 import 'package:mqtt_pro_client/home/home_page.dart';
 import 'package:mqtt_pro_client/addbroker.dart';
+import 'package:mqtt_pro_client/notmain.dart';
 /*
 import 'package:mqtt_client_app/pubsub/addnewsubtopic.dart';
 import 'package:mqtt_client_app/pubsub/agenda_page.dart';
@@ -64,6 +65,7 @@ class _ConfigPageState extends State<ConfigPage> {
             routes: {
               HomePage.routeName: (context) => HomePage(),
               AddBrokerPage.routeName: (context) => AddBrokerPage(),
+              NotMain.routeName: (context) => NotMain(),
 
            //   AgendaPage.routeName: (context) => AgendaPage(),
             //  AddNewSubTopicPage.routeName: (context) => AddNewSubTopicPage()
