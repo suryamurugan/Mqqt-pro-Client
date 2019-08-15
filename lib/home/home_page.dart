@@ -3,6 +3,12 @@ import 'package:mqtt_pro_client/home/index.dart';
 import 'package:mqtt_pro_client/universal/dev_scaffold.dart';
 import 'package:mqtt_pro_client/addbroker.dart';
 
+import 'package:mqtt_pro_client/config/config_bloc.dart';
+import 'package:mqtt_pro_client/config/config_event.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:share/share.dart';
+
+
 class HomePage extends StatelessWidget {
   static const String routeName = "/home";
 
@@ -22,6 +28,28 @@ class HomePage extends StatelessWidget {
           ),
       
       appBar: AppBar(
+        actions: <Widget>[
+              IconButton(
+                icon: Icon(
+                  ConfigBloc().darkModeOn
+                      ? FontAwesomeIcons.lightbulb
+                      : FontAwesomeIcons.solidLightbulb,
+                  size: 18,
+                ),
+                onPressed: () {
+                  ConfigBloc()
+                      .dispatch(DarkModeEvent(!ConfigBloc().darkModeOn));
+                },
+              ),
+              IconButton(
+                onPressed: () => Share.share(
+                    "Download the new DevFest App and share with your tech friends.\nPlayStore -  http://bit.ly/2GDr18N"),
+                icon: Icon(
+                  Icons.share,
+                  size: 20,
+                ),
+              ),
+            ],
             title: new Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[

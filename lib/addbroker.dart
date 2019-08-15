@@ -50,7 +50,7 @@ class AddBrokerPageState extends State<AddBrokerPage>{
         
       
         child:Ink(
-          color: Colors.white,
+          //color: Colors.white,
           child: new Column(
           
           mainAxisAlignment: MainAxisAlignment.center,
@@ -60,9 +60,11 @@ class AddBrokerPageState extends State<AddBrokerPage>{
              SizedBox(height: 10,),
             Container(
               padding: EdgeInsets.fromLTRB(30, 10, 30, 10),
-              child: TextField(
+              child: Theme(
+                data:Theme.of(context).copyWith(primaryColor: Colors.grey),
+                    child:  TextField(
               
-            decoration: InputDecoration(labelText: "Client ID",
+            decoration: InputDecoration(hintText: 'Client ID',
             suffixIcon: Icon(FontAwesomeIcons.idCard),
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
             border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -73,29 +75,37 @@ class AddBrokerPageState extends State<AddBrokerPage>{
             keyboardType: TextInputType.text,
             controller: clientIdController,
             ),
+              )
+             
             ),
             SizedBox(height: 10,),
             Container(
               padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
-              child: TextField(
-            decoration: InputDecoration(labelText: "Hostname/Server IP",
+              child: Theme(
+                data:Theme.of(context).copyWith(primaryColor: Colors.grey),
+                    child:  TextField(
+
+            decoration: InputDecoration(hintText: "Hostname/Server IP",
             suffixIcon: Icon(FontAwesomeIcons.server),
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
-            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+            
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)),),
             contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
             ),
             //style: TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
             //autofocus: true,
             keyboardType: TextInputType.text,
             controller: hostnameController,
-            ),
+            ),),
             ),
              SizedBox(height: 10,),
             Container(
               padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
-              child: TextField(
+              child: Theme(
+                data:Theme.of(context).copyWith(primaryColor: Colors.grey),
+                    child:  TextField(
               
-            decoration: InputDecoration(labelText: "Port",
+            decoration: InputDecoration(hintText: "Port",
             suffixIcon: Icon(Icons.web_asset),
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
             border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -105,14 +115,16 @@ class AddBrokerPageState extends State<AddBrokerPage>{
             //autofocus: true,
             keyboardType: TextInputType.text,
             controller: portNoController,
-            ),
+            ),)
             ),
             SizedBox(height: 10,),
             Container(
               padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
-              child: TextField(
+              child:Theme(
+                data:Theme.of(context).copyWith(primaryColor: Colors.grey),
+                    child:   TextField(
               
-            decoration: InputDecoration(labelText: "username",
+            decoration: InputDecoration(hintText: "username",
             suffixIcon: Icon(Icons.account_circle),
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
             border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -122,14 +134,17 @@ class AddBrokerPageState extends State<AddBrokerPage>{
             //autofocus: true,
             keyboardType: TextInputType.text,
             controller: usernameController,
-            ),
+            ),)
             ),
              SizedBox(height: 10,),
             Container(
               padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
-              child: TextField(
+              child: Theme(
+                data:Theme.of(context).copyWith(primaryColor: Colors.grey),
+                    child:  TextField(
+
               
-            decoration: InputDecoration(labelText: "Password",
+            decoration: InputDecoration(hintText: "Password",
             suffixIcon: Icon(FontAwesomeIcons.key),
             
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
@@ -141,7 +156,7 @@ class AddBrokerPageState extends State<AddBrokerPage>{
             keyboardType: TextInputType.text,
             controller: passwordController,
             obscureText: true,
-            ),
+            ),)
             ),
             SizedBox(height: 10,),
 

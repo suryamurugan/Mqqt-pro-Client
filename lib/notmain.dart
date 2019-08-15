@@ -4,14 +4,15 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mqtt_client/mqtt_client.dart' as mqtt;
-import 'package:mqtt_pro_client/dev_scafold2.dart';
 import 'package:mqtt_pro_client/models/brokerObj.dart';
-import 'package:mqtt_pro_client/universal/dev_scaffold.dart';
 import 'models/message.dart';
 import 'dialogs/send_message.dart';
 import 'dart:math';
 import 'utils/tools.dart';
 import 'models/submodel.dart';
+import 'package:toast/toast.dart';
+
+
 
 class NotMain extends StatefulWidget {
 
@@ -85,9 +86,11 @@ class _MyAppState extends State<NotMain> {
 
     return DefaultTabController(
       length: 2,
-      child: DevScaffold2(
-        title: brokerObj.hostname,
-          tabBar: TabBar(
+      child: Scaffold(
+        appBar: AppBar(
+            title: Text(brokerObj.hostname),
+            centerTitle: true,
+            bottom: TabBar(
             
             indicatorSize: TabBarIndicatorSize.label,
             indicatorColor: Tools.multiColors[Random().nextInt(4)],
@@ -123,6 +126,50 @@ class _MyAppState extends State<NotMain> {
           */
           ],
         ),
+            actions: <Widget>[
+               IconButton(
+                
+                onPressed: (){
+                    client.connect();
+                },
+                icon: Icon(
+                  Icons.refresh,
+                  size: 20,
+                ),
+              ),
+
+              IconButton(
+                
+                onPressed: (){
+                    if(client.connectionStatus ==mqtt.MqttConnectionState.connected){
+                        print("Client is Connected bro");
+                    }
+                    else{
+                      print("not coonnected");
+                    }
+                },
+                icon: Icon(
+                  connectionStateIcon,
+                  size: 20,
+                ),
+              ),
+              /*IconButton(
+                icon: Icon(
+                  ConfigBloc().darkModeOn
+                      ? FontAwesomeIcons.lightbulb
+                      : FontAwesomeIcons.solidLightbulb,
+                  size: 18,
+                ),
+                onPressed: () {
+                  ConfigBloc()
+                      .dispatch(DarkModeEvent(!ConfigBloc().darkModeOn));
+                },
+              ),
+              */
+            ],
+          ),
+        
+        
          body: TabBarView(
           children: <Widget>[
              _buildBrokerPage(connectionStateIcon),
@@ -179,7 +226,7 @@ class _MyAppState extends State<NotMain> {
                 onSubmitted: (String topic) {
                   _subscribeToTopic(topic);
                 },
-                decoration: InputDecoration(labelText: 'Please enter a topic',),
+                decoration: InputDecoration(hintText: 'Enter Topic'),
               ),
             ),
             SizedBox(width: 8.0),
@@ -590,16 +637,19 @@ Column _buildSubscriptionsPage() {
       await client.connect();
     } catch (e) {
       print(e);
+      showDisConnectedToast();
       _disconnect();
     }
 
     /// Check if we are connected
     if (client.connectionState == mqtt.MqttConnectionState.connected) {
+     showConnectedToast();
       print('MQTT client connected');
       setState(() {
         connectionState = client.connectionState;
       });
     } else {
+    showDisConnectedToast();
       print('ERROR: MQTT client connection failed - '
           'disconnecting, state is ${client.connectionState}');
       _disconnect();
@@ -621,6 +671,7 @@ Column _buildSubscriptionsPage() {
 
   void _onDisconnected() {
     setState(() {
+      showDisConnectedToast();
       topics.clear();
       connectionState = client.connectionState;
       client = null;
@@ -740,6 +791,7 @@ Column _buildSubscriptionsPage() {
         if (topics.add(topic.trim())) {
           print('Subscribing to ${topic.trim()}');
           client.subscribe(topic, mqtt.MqttQos.exactlyOnce);
+          Toast.show("Subscribed to $topic", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
         }
       });
     }
@@ -773,6 +825,13 @@ Column _buildSubscriptionsPage() {
        
       });
     }
+  }
+
+  void showConnectedToast() {
+    Toast.show("Client Connected", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
+  }
+void showDisConnectedToast() {
+    Toast.show("Client Disconnected", context, duration: Toast.LENGTH_SHORT, gravity:  Toast.BOTTOM);
   }
 
 

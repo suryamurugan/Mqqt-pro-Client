@@ -57,9 +57,11 @@ class _ConfigPageState extends State<ConfigPage> {
                   colorScheme: configBloc.darkModeOn
                       ? ColorScheme.dark()
                       : ColorScheme.light()),
+          
               appBarTheme: AppBarTheme(
                 elevation: 0.0,
               ),
+              
             ),
             home: HomePage(),
             routes: {
