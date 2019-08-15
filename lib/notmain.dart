@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:mqtt_client/mqtt_client.dart' as mqtt;
 import 'package:mqtt_pro_client/dev_scafold2.dart';
 import 'package:mqtt_pro_client/models/brokerObj.dart';
@@ -96,10 +97,11 @@ class _MyAppState extends State<NotMain> {
             isScrollable: false,
           tabs: <Widget>[
             Tab(
+              
               child: Text("Subscribe"),
               icon: Icon(
                 //FontAwesomeIcons.cloudDownloadAlt,
-                Icons.ac_unit,
+                FontAwesomeIcons.listUl,
                 size: 12,
               ),
             ),
@@ -107,7 +109,7 @@ class _MyAppState extends State<NotMain> {
               child: Text("Publish"),
               icon: Icon(
                //FontAwesomeIcons.planeDeparture,
-               Icons.access_alarm,
+               FontAwesomeIcons.paperPlane,
                 size: 12,
               ),
             ),
@@ -177,14 +179,15 @@ class _MyAppState extends State<NotMain> {
                 onSubmitted: (String topic) {
                   _subscribeToTopic(topic);
                 },
-                decoration: InputDecoration(hintText: 'Please enter a topic'),
+                decoration: InputDecoration(labelText: 'Please enter a topic',),
               ),
             ),
             SizedBox(width: 8.0),
             RaisedButton(
               shape: StadiumBorder(),
               color: Colors.red,
-              child: Text('add topic',style: TextStyle(color: Colors.white),),
+             // child: Icon(FontAwesomeIcons.plus),
+              child: Text('Add',style: TextStyle(color: Colors.white),),
               onPressed: () {
                 _subscribeToTopic(topicController.value.text);
               },
@@ -195,12 +198,26 @@ class _MyAppState extends State<NotMain> {
           )
         ),
         
-        SizedBox(height: 16.0),
+        SizedBox(height: 0.0),
         new Expanded(child: ListView.builder(
           
           itemCount: subobj.length, 
           itemBuilder: (context,item){
-            return Card(
+            return  Card(
+              elevation: 0.0,
+              
+      child: ListTile(
+        leading: Text(subobj[item].topic,style: TextStyle(fontWeight: FontWeight.w800),),
+        title: Text(subobj[item].message,style: TextStyle(fontWeight: FontWeight.w100)),
+        trailing: IconButton(
+          icon: Icon(FontAwesomeIcons.minusSquare,color: Colors.red,),
+          onPressed: (){
+            _unsubscribeFromTopicSURYA(subobj[item]);
+          },
+        ),
+      ),
+    );
+              /*
                 child:new Row(
                   children: <Widget>[
                   
@@ -213,7 +230,8 @@ class _MyAppState extends State<NotMain> {
                       },
                     ),
                   ],
-                ) ,);
+                ) */
+                
 
           }
           ))
@@ -655,7 +673,11 @@ Column _buildSubscriptionsPage() {
       print(event[0].topic);
        if(topicController.text == event[0].topic){
         print("Bro this is from the same topics");
+        
+       
+
         pubmessage=message;
+        
       }
 
       int i=0;

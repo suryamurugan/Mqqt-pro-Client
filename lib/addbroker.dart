@@ -42,11 +42,17 @@ class AddBrokerPageState extends State<AddBrokerPage>{
     //var state = _homeBloc.currentState as InHomeState;
    
     return DevScaffold(
+      
       body: new SingleChildScrollView(
+        
         child: 
       Center (
+        
       
-        child: new Column(
+        child:Ink(
+          color: Colors.white,
+          child: new Column(
+          
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             
@@ -57,7 +63,7 @@ class AddBrokerPageState extends State<AddBrokerPage>{
               child: TextField(
               
             decoration: InputDecoration(labelText: "Client ID",
-            suffixIcon: Icon(Icons.supervised_user_circle),
+            suffixIcon: Icon(FontAwesomeIcons.idCard),
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
             border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
             contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
@@ -73,7 +79,7 @@ class AddBrokerPageState extends State<AddBrokerPage>{
               padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
               child: TextField(
             decoration: InputDecoration(labelText: "Hostname/Server IP",
-            suffixIcon: Icon(Icons.computer),
+            suffixIcon: Icon(FontAwesomeIcons.server),
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
             border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
             contentPadding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
@@ -124,7 +130,7 @@ class AddBrokerPageState extends State<AddBrokerPage>{
               child: TextField(
               
             decoration: InputDecoration(labelText: "Password",
-            suffixIcon: Icon(Icons.vpn_key),
+            suffixIcon: Icon(FontAwesomeIcons.key),
             
             labelStyle: TextStyle(fontWeight: FontWeight.w300, ),
             border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
@@ -178,6 +184,7 @@ class AddBrokerPageState extends State<AddBrokerPage>{
 
           ],
         ),
+        ) 
       ),),
       title: "Add new broker",
     );

@@ -35,7 +35,8 @@ final dbHelper = DatabaseHelper.instance;
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image.asset("cloud.png",width:100,height: 100,),
+          
+          //Image.asset("cloud.png",width:100,height: 100,),
           new Container(
             padding: EdgeInsets.all(30),
             child: Text("Dude ! add new broker",
@@ -49,6 +50,7 @@ final dbHelper = DatabaseHelper.instance;
         if (snapshot.hasData) {
             return ListView.builder(
               
+              
               itemCount: snapshot.data.length,
               itemBuilder: (BuildContext context, int index) {
                 BrokerObj item = snapshot.data[index];
@@ -61,6 +63,25 @@ final dbHelper = DatabaseHelper.instance;
                        // DBProvider.db.deleteClient(item.id);
                     },
                   child: Card(
+      child: ListTile(
+        leading: Icon(FontAwesomeIcons.server,color: Tools.multiColors[Random().nextInt(4)],),
+        title: Text(item.hostname),
+        subtitle: Text(item.clientId),
+        trailing: Text(item.portNo),
+        onTap: (){
+           Navigator.push(
+                context,
+                MaterialPageRoute(
+                 // builder: (context) => SessionDetail(
+                  //  session: allSessions[i],
+                  builder: (context)=>NotMain(brokerObj: item,),
+                  ),
+              
+              );
+        },
+      ),
+    )
+                  /*Card(
           elevation: 0.6,
           child: ListTile(
             onTap: () {
@@ -77,60 +98,24 @@ final dbHelper = DatabaseHelper.instance;
             },
             // dense: true,
             isThreeLine: true,
-            trailing: RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                text: 'port\n',
-                style: Theme.of(context)
+            trailing: Text(item.portNo, style: Theme.of(context)
                     .textTheme
                     .title
-                    .copyWith(fontSize: 14, fontWeight: FontWeight.bold),
-                children: [
-                  TextSpan(
-                    text:item.portNo,
-                    style: Theme.of(context).textTheme.subtitle.copyWith(
-                          fontSize: 12,
-                        ),
-                  ),
-                ],
-              ),
-            ),
+                    .copyWith(fontSize: 14, fontWeight: FontWeight.bold),softWrap: true,textAlign: TextAlign.center,),
             leading: Hero(
               tag: item.id,
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: Colors.white,
-                child: Image.asset("server.png"),
-                //backgroundImage:
-                  //  ExactAssetImage("assets/server.png",scale: 100.0)
-              ),
+              child: Icon(FontAwesomeIcons.server),
             ),
-            title: RichText(
-              text: TextSpan(
-                
-                text:item.hostname+'\n',
-                style: Theme.of(context).textTheme.title.copyWith(fontSize: 18),
-                children: [
-                  TextSpan(
-                    
-                      text: item.clientId,
-                      style: Theme.of(context).textTheme.subtitle.copyWith(
-                            fontSize: 14,
-                            color: Tools.multiColors[Random().nextInt(4)],
-                            
-                          ),
-                      children: []),
-                ],
-              ),
-            ),
+            title: Text(item.hostname,
+                style: TextStyle(fontSize: 20),),
             subtitle: Text(
-              item.username,
+              item.clientId,
               style: Theme.of(context).textTheme.caption.copyWith(
-                    fontSize: 10.0,
+                    fontSize: 14.0,
                   ),
             ),
           ),
-        ),
+        ),*/
                   /*ListTile(
                     
                   
