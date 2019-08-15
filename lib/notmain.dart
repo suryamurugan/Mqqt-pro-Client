@@ -10,7 +10,12 @@ import 'models/message.dart';
 import 'dialogs/send_message.dart';
 import 'dart:math';
 import 'utils/tools.dart';
+import 'models/submodel.dart';
+
 class NotMain extends StatefulWidget {
+
+
+
  
   
 final BrokerObj brokerObj;
@@ -24,6 +29,10 @@ final BrokerObj brokerObj;
 }
 
 class _MyAppState extends State<NotMain> {
+
+
+  String logger='';
+  String pubmessage; 
   
   
   BrokerObj  brokerObj;
@@ -44,10 +53,8 @@ class _MyAppState extends State<NotMain> {
   StreamSubscription subscription;
 
   Set<String> topics = Set<String>();
+  List<SubObj> subobj = <SubObj>[];
 
-
-  
-  
 
   List<Message> messages = <Message>[];
 
@@ -189,14 +196,35 @@ class _MyAppState extends State<NotMain> {
         ),
         
         SizedBox(height: 16.0),
-        
+        new Expanded(child: ListView.builder(
+          
+          itemCount: subobj.length, 
+          itemBuilder: (context,item){
+            return Card(
+                child:new Row(
+                  children: <Widget>[
+                  
+                    Text(subobj[item].topic),
+                    Text(subobj[item].message),
+                    IconButton(
+                      icon: Icon(Icons.delete),
+                      onPressed: (){
+                        _unsubscribeFromTopicSURYA(subobj[item]);
+                      },
+                    ),
+                  ],
+                ) ,);
+
+          }
+          ))
+       /* 
         Wrap(
           spacing: 8.0,
           runSpacing: 4.0,
           alignment: WrapAlignment.start,
-          children: _buildTopicList(),
+          children: _buildTopicsMap(),
         )
-   
+   */
 
         /*
         Row(
@@ -269,19 +297,15 @@ Column _buildSubscriptionsPage() {
               
               child: TextField(
                 controller: topicController,
-                onSubmitted: (String topic) {
-                  _subscribeToTopic(topic);
-                },
+                
                 decoration: InputDecoration(hintText: 'Topic'),
               ),
             ),
             SizedBox(
               
               child: TextField(
-                controller: topicController,
-                onSubmitted: (String topic) {
-                  _subscribeToTopic(topic);
-                },
+                controller: messageController,
+                
                 decoration: InputDecoration(hintText: 'Message'),
               ),
             ),
@@ -296,15 +320,29 @@ Column _buildSubscriptionsPage() {
             colorBrightness: Brightness.dark,
             //onPressed: () => Navigator.pushNamed(context, AgendaPage.routeName),
             onPressed: () {
+              print("dude this is before publishing");
+             // _subscribeToTopicForPublishing(topicController.text);
+             _publishMessage(topicController.text, messageController.text);
+              setState(() {
+                print(logger??'No data');
+                //logger =logger+'\n';
+
+              });
               print("clicked");
                // _connect_to(context);
               //_connect_to(context);
             },
           ),
           Container(
+            padding: EdgeInsets.all(20),
             child: new Column(
+
               children: <Widget>[
-                Text("Cdscs")
+
+                new Text("Topic: "+topicController.text),
+                new Text(pubmessage ?? ' ')
+               
+                
 
               ],
             ),
@@ -373,7 +411,46 @@ Column _buildSubscriptionsPage() {
     _pageController = PageController();
     super.initState();
     _connect();
+    logger = 's';
   }
+
+
+   List<Widget> _buildTopicsMap() {
+
+
+    // Sort topics
+    final List<String> sortedTopics = topics.toList()
+      ..sort((String a, String b) {
+        return compareNatural(a, b);
+      });
+      
+    /*return sortedTopics 
+        .map((String topic) => Chip(
+              label: Text(topic),
+              onDeleted: () {
+                _unsubscribeFromTopic(topic);
+              },
+            ))
+        .toList();*/
+        return sortedTopics.map((String topic)=>ListTile(
+          
+          title: Text("Message"),
+          leading: Text(topic,style: TextStyle(fontFamily: "GoogleSans",fontWeight: FontWeight.w600),),
+          trailing: IconButton(icon: Icon(Icons.delete_sweep,),
+                                onPressed: (){
+                                 // setState(() {
+                                    // /topics.remove(topic);
+                                    _unsubscribeFromTopic(topic);
+                                 // });
+                                  print(topics);
+                                  
+                                  
+                                },),
+        )
+      ).toList();
+      
+  }
+
 
   List<Widget> _buildMessageList() {
     return messages
@@ -405,6 +482,8 @@ Column _buildSubscriptionsPage() {
         .reversed
         .toList();
   }
+
+
 
   List<Widget> _buildTopicList() {
     // Sort topics
@@ -533,7 +612,28 @@ Column _buildSubscriptionsPage() {
     print('MQTT client disconnected');
   }
 
+  void _publishMessage(String pubTopic,String pubMessage){
+ //this is for publishing
+  print("for publishing");
+  /// Lets publish to our topic
+  /// Use the payload builder rather than a raw buffer
+  /// Our known topic to publish to
+ final mqtt.MqttClientPayloadBuilder builder = mqtt.MqttClientPayloadBuilder();
+  
+  builder.addString(pubMessage);
+
+  /// Subscribe to it
+  print('EXAMPLE::Subscribing to the Dart/Mqtt_client/testtopic topic');
+  client.subscribe(pubTopic, mqtt.MqttQos.exactlyOnce);
+
+  /// Publish it
+  print('EXAMPLE::Publishing our topic');
+  client.publishMessage(pubTopic, mqtt.MqttQos.exactlyOnce, builder.payload);
+
+  }
+
   void _onMessage(List<mqtt.MqttReceivedMessage> event) {
+    
     print(event.length);
     final mqtt.MqttPublishMessage recMess =
         event[0].payload as mqtt.MqttPublishMessage;
@@ -550,6 +650,28 @@ Column _buildSubscriptionsPage() {
     print(client.connectionState);
     print("THis message is from on MeSAAGE");
     setState(() {
+      print("Got a message bro ");
+      print(subobj.length);
+      print(event[0].topic);
+       if(topicController.text == event[0].topic){
+        print("Bro this is from the same topics");
+        pubmessage=message;
+      }
+
+      int i=0;
+      for(i=0;i<subobj.length;i++){
+        if(subobj[i].topic == event[0].topic)
+        {
+          subobj[i].message = message;
+          print("bro ${subobj[i].message}");
+        }
+      }
+     
+
+      
+
+      
+  
       
       messages.add(Message(
         topic: event[0].topic,
@@ -570,9 +692,29 @@ Column _buildSubscriptionsPage() {
     });
   }
 
+
+    void _subscribeToTopicForPublishing(String topic) {
+    if (connectionState == mqtt.MqttConnectionState.connected) {
+      setState(() {
+        //subobj.add(SubObj(topic: topic,message: ''));
+        print("inside sub function $subobj");
+
+          
+       // if (topics.add(topic.trim())) {
+          print('Subscribing to ${topic.trim()}');
+          client.subscribe(topic, mqtt.MqttQos.exactlyOnce);
+       // }
+      });
+    }
+  }
+
   void _subscribeToTopic(String topic) {
     if (connectionState == mqtt.MqttConnectionState.connected) {
       setState(() {
+        subobj.add(SubObj(topic: topic,message: ''));
+        print("inside sub function $subobj");
+
+        
         if (topics.add(topic.trim())) {
           print('Subscribing to ${topic.trim()}');
           client.subscribe(topic, mqtt.MqttQos.exactlyOnce);
@@ -584,6 +726,11 @@ Column _buildSubscriptionsPage() {
   void _unsubscribeFromTopic(String topic) {
     if (connectionState == mqtt.MqttConnectionState.connected) {
       setState(() {
+        print("Before Deleting $subobj");
+        print("Inside unsubscribe ");
+      //  print(subobj.remove();
+        print("After Deleting $subobj");
+
         if (topics.remove(topic.trim())) {
           print('Unsubscribing from ${topic.trim()}');
           client.unsubscribe(topic);
@@ -591,6 +738,21 @@ Column _buildSubscriptionsPage() {
       });
     }
   }
+    void _unsubscribeFromTopicSURYA(SubObj subObj ){
+    if (connectionState == mqtt.MqttConnectionState.connected) {
+      setState(() {
+        print("Before Deleting $subobj");
+        print("Inside unsubscribe ");
+        print(subobj.remove(subObj));
+        print("After Deleting $subobj");
+        client.unsubscribe(subObj.topic);
+        print("Unsubscribing from $subObj");
+
+       
+      });
+    }
+  }
+
 
  
 }
